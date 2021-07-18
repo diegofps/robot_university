@@ -2,29 +2,30 @@ from .baseprofessor import BaseProfessor
 
 class Python3Professor(BaseProfessor):
 
-    def __init__(self, template_filepath, stud_params, image_name="python3image:v0"):
-        super().__init__("Python3Professor", template_filepath, stud_params, image_name)
+    def __init__(self, exercise):
+        if exercise.image_name is None:
+            exercise.image_name = "python3image:v0"
+        super().__init__("Python3Professor", exercise)
     
-    def compile(self, _):
-        print("You don't need to call compile on a python app")
+    def evaluate(self, ch):
 
-    def evaluate(self, ex):
-        # Create the program inside the container, run it and capture its outputs
-        ex.prof_program = self.render(self.stud_program, ex.prof_params)
-        self.create_file("/app/main.py", ex.prof_program, True)
-        ex.returncode, ex.stdout, ex.stderr = self.execute("/app/main.py " + ex.input_params)
+        # Copy and render the template files into the container
+        self.deploy(ch)
+
+        # Execute the exercise with current execution parameters
+        ch.returncode, ch.stdout, ch.stderr = self.execute("python3 " + self.exercise.mainfile + " " + ch.input_params)
 
         # Calculate the response correctness
-        if ex.returncode != ex.expected_returncode:
-            ex.issues_explanation.append("returncode is not correct")
+        if ch.returncode != ch.expected_returncode:
+            ch.issues_explanation.append("returncode is not correct")
 
-        if not self.soft_compare(ex.stdout, ex.expected_stdout):
-            ex.issues_explanation.append("stdout is not correct")
+        if not self.soft_compare(ch.stdout, ch.expected_stdout):
+            ch.issues_explanation.append("stdout is not correct")
         
-        if not self.soft_compare(ex.stderr, ex.expected_stderr):
-            ex.issues_explanation.append("stderr is not correct")
+        if not self.soft_compare(ch.stderr, ch.expected_stderr):
+            ch.issues_explanation.append("stderr is not correct")
         
-        ex.correctness = 0.0 if ex.issues_explanation else 1.0
+        ch.correctness = 0.0 if ch.issues_explanation else 1.0
 
         # Add respose to summary
-        self.add_execution(ex)
+        self.add_challenge(ch)

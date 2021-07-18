@@ -1,4 +1,4 @@
-class Execution:
+class Challenge:
 
     def __init__(self):
         
@@ -18,12 +18,13 @@ class Execution:
 
         self.issues_explanation = []
         self.correctness = 0.0
+        self.compilation = None
 
     def show(self, indentation, include_program=False):
         prefix = " " * indentation
 
         print()
-        print(prefix + "Execution %d" % self.idd)
+        print(prefix + "Challenge %d:" % self.idd)
         print(prefix + "  expected_returncode: " + str(self.expected_returncode))
         print(prefix + "  expected_stdout: " + self.expected_stdout)
         print(prefix + "  expected_stderr: " + self.expected_stderr)
@@ -37,6 +38,9 @@ class Execution:
 
         print(prefix + "  issues_explanation: " + str(self.issues_explanation))
         print(prefix + "  correctness: " + str(self.correctness))
+
+        if self.compilation:
+            self.compilation.show(indentation + 2, include_program)
 
         if include_program:
             print(prefix + "  prof_program: " + self.prof_program)

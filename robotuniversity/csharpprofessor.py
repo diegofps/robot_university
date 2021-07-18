@@ -1,31 +1,41 @@
 from .baseprofessor import BaseProfessor
+from .compilation import Compilation
 
 class CSharpProfessor(BaseProfessor):
 
-    def __init__(self, template_filepath, stud_params, image_name="csharp:v0"):
-        super().__init__("CSharpProfessor", template_filepath, stud_params, image_name)
+  def __init__(self, exercise):
+    if exercise.image_name is None:
+      exercise.image_name = "monoimage:v0"
+    super().__init__("CSharpProfessor", exercise)
+  
+  def compile(self, exercise, challenge):
+    comp = Compilation()
+    sources = "".join([x[1] for x in exercise.templates if x[1].endswith(".cs")])
+    sources += "".join([x[1] for x in exercise.assets if x[1].endswith(".cs")])
+    cmd = "mcs " + sources + " -out:" + exercise.mainfile
+    comp.returncode, comp.stdout, comp.stderr = self.execute(cmd)
+    comp.correctness = 1.0 if comp.returncode == 0 else 0.0
+    challenge.compilation = comp
+
+  def evaluate(self, ch):
+
+    # Copy and render the template files into the container, compile if necessary
+    self.deploy(ch)
+
+    # Execute the exercise with current execution parameters
+    ch.returncode, ch.stdout, ch.stderr = self.execute("mono " + self.exercise.mainfile + " " + ch.input_params)
+
+    # Calculate the response correctness
+    if ch.returncode != ch.expected_returncode:
+        ch.issues_explanation.append("returncode is not correct")
+
+    if not self.soft_compare(ch.stdout, ch.expected_stdout):
+        ch.issues_explanation.append("stdout is not correct")
     
-    def compile(self, comp):
-        self.create_file("/app/exercise1.cs", self.user_program)
-        comp.returncode, comp.stdout, comp.stderr = self.execute("mcs exercise1.cs")
+    if not self.soft_compare(ch.stderr, ch.expected_stderr):
+        ch.issues_explanation.append("stderr is not correct")
+    
+    ch.correctness = 0.0 if ch.issues_explanation else 1.0
 
-    def evaluate(self, ex):
-        # Create the program inside the container, run it and capture its outputs
-        ex.prof_program = self.render(self.stud_program, ex.prof_params)
-        self.create_file("/app/main.py", ex.prof_program, True)
-        ex.returncode, ex.stdout, ex.stderr = self.execute("/app/main.py " + ex.input_params)
-
-        # Calculate the response correctness
-        if ex.returncode != ex.expected_returncode:
-            ex.issues_explanation.append("returncode is not correct")
-
-        if not self.soft_compare(ex.stdout, ex.expected_stdout):
-            ex.issues_explanation.append("stdout is not correct")
-        
-        if not self.soft_compare(ex.stderr, ex.expected_stderr):
-            ex.issues_explanation.append("stderr is not correct")
-        
-        ex.correctness = 0.0 if ex.issues_explanation else 1.0
-
-        # Add respose to summary
-        self.add_execution(ex)
+    # Add respose to summary
+    self.add_challenge(ch)

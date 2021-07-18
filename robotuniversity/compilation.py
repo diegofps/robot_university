@@ -2,8 +2,7 @@
 class Compilation:
 
   def __init__(self):
-    self.idd = -1
-    self.correctness = 0.0
+    self.correctness = 1.0
     self.returncode = 0
     self.stdout = ""
     self.stderr = ""
@@ -12,7 +11,7 @@ class Compilation:
     prefix = " " * indentation
 
     print()
-    print(prefix + "Compilation %d" % self.idd)
+    print(prefix + "Compilation:")
     
     print(prefix + "  correctness: " + str(self.correctness))
 
