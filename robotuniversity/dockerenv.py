@@ -2,6 +2,7 @@ import subprocess
 import tempfile
 import shlex
 import uuid
+import os
 
 
 class DockerEnv:
@@ -37,6 +38,12 @@ class DockerEnv:
     def make_executable(self, env_filepath):
         self.execute("chmod +x " + env_filepath)
     
+    def create_file_from_template(self, env_filepath, local_template_filepath, template_parameters, make_executable=False):
+    
+        with open(local_template_filepath) as fin:
+            content = self.render(fin.read(), template_parameters)
+            self.create_file(env_filepath, content, make_executable)
+    
     def create_file(self, env_filepath, content, make_executable=False):
         with tempfile.NamedTemporaryFile() as fout:
             fout.write(content.encode('utf-8'))
@@ -46,18 +53,13 @@ class DockerEnv:
         if make_executable:
             self.make_executable(env_filepath)
     
-    def create_file_from_template(self, env_filepath, local_template_filepath, template_parameters, make_executable=False):
-    
-        with open(local_template_filepath) as fin:
-            content = self.render(fin.read(), template_parameters)
-            self.create_file(env_filepath, content, make_executable)
-    
     def send_file(self, local_filepath, env_filepath, make_executable=False):
-        cmd = "docker cp %s %s:%s" % (
-                local_filepath, 
-                self.container_name, 
-                env_filepath)
-        
+        dirname = os.path.dirname(env_filepath)
+
+        cmd = "docker exec %s mkdir -p '%s'" % (self.container_name, dirname)
+        subprocess.run(shlex.split(cmd))
+
+        cmd = "docker cp %s %s:%s" % (local_filepath, self.container_name, env_filepath)
         subprocess.run(shlex.split(cmd))
 
         if make_executable:

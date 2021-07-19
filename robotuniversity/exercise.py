@@ -1,3 +1,6 @@
+from robotuniversity.template import Template
+from robotuniversity.asset import Asset
+
 class Exercise:
 
     def __init__(self):
@@ -8,6 +11,14 @@ class Exercise:
         self.stud_params = {}
         self.assets = []
 
+    def add_template(self, *args, **params):
+        template = Template(*args, **params)
+        self.templates.append(template)
+    
+    def add_asset(self, *args, **params):
+        template = Asset(*args, **params)
+        self.assets.append(template)
+    
     def show(self, indentation, include_program=False):
         prefix = " " * indentation
 

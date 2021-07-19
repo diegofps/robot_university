@@ -3,6 +3,7 @@ class Challenge:
     def __init__(self):
         
         self.idd = -1
+        self.rootpath = "/"
 
         self.expected_returncode = 0
         self.expected_stdout = ""
@@ -25,6 +26,7 @@ class Challenge:
 
         print()
         print(prefix + "Challenge %d:" % self.idd)
+        print(prefix + "  rootpath: " + str(self.rootpath))
         print(prefix + "  expected_returncode: " + str(self.expected_returncode))
         print(prefix + "  expected_stdout: " + self.expected_stdout)
         print(prefix + "  expected_stderr: " + self.expected_stderr)

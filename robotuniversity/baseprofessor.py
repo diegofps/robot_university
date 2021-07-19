@@ -1,3 +1,5 @@
+from multiprocessing import Pool
+
 from .compilation import Compilation
 from .dockerenv import DockerEnv
 from .summary import Summary
@@ -14,24 +16,29 @@ class BaseProfessor(DockerEnv):
         self.professor_name = professor_name
         self.never_compiled = True
 
-        for local_filepath, env_filepath in self.exercise.assets:
-            self.send_file(local_filepath, env_filepath)
+        for asset in self.exercise.assets:
+            if asset.content is None:
+                self.send_file(asset.local_filepath, asset.env_filepath)
+            else:
+                self.create_file(asset.content, asset.env_filepath)
     
     def deploy(self, ch):
-        if not self.never_compiled and not ch.prof_params:
-            return 
+        for template in self.exercise.templates:
+            env_filepath = ch.rootpath + template.env_filepath
 
-        for local_filepath, env_filepath in self.exercise.templates:
-            with open(local_filepath, "r") as fin:
-                program = fin.read()
+            if template.content is None:
+                with open(template.local_filepath, "r") as fin:
+                    program = fin.read()
+            else:
+                program = template.content
 
-                if self.exercise.stud_params:
-                    program = self.render(program, self.exercise.stud_params)
+            if self.exercise.stud_params:
+                program = self.render(program, self.exercise.stud_params)
 
-                if ch.prof_params:
-                    program = self.render(program, ch.prof_params)
-                
-                self.create_file(env_filepath, program)
+            if ch.prof_params:
+                program = self.render(program, ch.prof_params)
+            
+            self.create_file(env_filepath, program)
         
         self.compile(self.exercise, ch)
         self.never_compiled = False
@@ -40,11 +47,39 @@ class BaseProfessor(DockerEnv):
         # Overwrite this in case this source needs custom compiling (like c,cpp, java, csharp, ...)
         challenge.compilation = Compilation()
 
-    def add_challenge(self, execution):
-        execution.idd = len(self.challenges)
-        self.challenges.append(execution)
-    
+    def check_challenge_response(self, ch):
+        # Overwrite this in case you want to customize correctness
+        
+        if ch.returncode != ch.expected_returncode:
+            ch.issues_explanation.append("returncode is not correct")
+
+        if not self.soft_compare(ch.stdout, ch.expected_stdout):
+            ch.issues_explanation.append("stdout is not correct")
+        
+        if not self.soft_compare(ch.stderr, ch.expected_stderr):
+            ch.issues_explanation.append("stderr is not correct")
+        
+        ch.correctness = 0.0 if ch.issues_explanation else 1.0
+
+    def run(self, ex, ch):
+        # Overwrite this in case you want to customize how to start the application (like java -jar ..., python3 ..., so on)
+        ch.returncode, ch.stdout, ch.stderr = self.execute(ch.rootpath + ex.mainfile + " " + ch.input_params)
+
+    def add_challenge(self, ch):
+        ch.idd = len(self.challenges)
+        ch.rootpath = "/challenges/" + str(ch.idd) + "/"
+        self.challenges.append(ch)
+
+    def mapper(self, ch):
+        self.deploy(ch)
+        self.run(self.exercise, ch)
+        self.check_challenge_response(ch)
+        return ch
+
     def summary(self):
+        with Pool() as p:
+            self.challenges = p.map(self.mapper, self.challenges)
+
         sm = Summary()
 
         sm.num_challenges = len(self.challenges)
