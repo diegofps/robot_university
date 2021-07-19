@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 
-from robotuniversity.cprofessor import CProfessor
+from robotuniversity.cppprofessor import CPPProfessor
 from robotuniversity.challenge import Challenge
 from robotuniversity.exercise import Exercise
 
 exercise = Exercise()
-exercise.templates.append( ("./classes/c/exercise1/main.template.c", "/app/main.c") )
+exercise.templates.append( ("./classes/cpp/exercise1/main.template.cpp", "/app/main.cpp") )
 exercise.mainfile = "/app/main"
 exercise.stud_params = {
-    "STUD.IMPORTS": "#include <stdio.h>",
-    "STUD.FUNCTIONS": "int secret(int a, int b) {\n        return a * b;\n    }",
+    "STUD.IMPORTS": "",
+    "STUD.FUNCTIONS": "int secret(int const a, int const b) {\n        return a * b;\n    }",
     "STUD.SECRET_NAME": "secret"
 }
 
-with CProfessor(exercise) as prof:
+with CPPProfessor(exercise) as prof:
 
     ch = Challenge()
     ch.input_params = "10 10"
