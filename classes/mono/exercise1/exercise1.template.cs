@@ -7,8 +7,8 @@ public class Exercise1
 
     public static void Main(string[] args)
     {
-	int a = int.Parse(args[0]);
-	int b = int.Parse(args[1]);
+        int a = int.Parse(args[0]);
+        int b = int.Parse(args[1]);
         Console.WriteLine('STUD.SECRET_NAME'(a,b));
     }
 }

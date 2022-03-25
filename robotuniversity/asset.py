@@ -12,5 +12,5 @@ class Asset:
     if local_filepath is None and content is None:
       raise RuntimeError("local_filepath and content can not be both None")
 
-    if env_filepath.startswith("/"):
-      raise RuntimeError("env_filepath must no be an absolute path")
+  def __str__(self):
+    return self.__dict__.__str__()

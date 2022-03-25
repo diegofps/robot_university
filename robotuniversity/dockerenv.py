@@ -44,6 +44,10 @@ class DockerEnv:
             content = self.render(fin.read(), template_parameters)
             self.create_file(env_filepath, content, make_executable)
     
+    def create_folder(self, env_folderpath):
+        cmd = "docker exec %s mkdir -p '%s'" % (self.container_name, env_folderpath)
+        subprocess.run(shlex.split(cmd))
+
     def create_file(self, env_filepath, content, make_executable=False):
         with tempfile.NamedTemporaryFile() as fout:
             fout.write(content.encode('utf-8'))
@@ -55,9 +59,7 @@ class DockerEnv:
     
     def send_file(self, local_filepath, env_filepath, make_executable=False):
         dirname = os.path.dirname(env_filepath)
-
-        cmd = "docker exec %s mkdir -p '%s'" % (self.container_name, dirname)
-        subprocess.run(shlex.split(cmd))
+        self.create_folder(dirname)
 
         cmd = "docker cp %s %s:%s" % (local_filepath, self.container_name, env_filepath)
         subprocess.run(shlex.split(cmd))

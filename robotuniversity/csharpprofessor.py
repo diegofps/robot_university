@@ -1,5 +1,6 @@
 from .baseprofessor import BaseProfessor
 from .compilation import Compilation
+import os
 
 class CSharpProfessor(BaseProfessor):
 
@@ -10,9 +11,15 @@ class CSharpProfessor(BaseProfessor):
     super().__init__("CSharpProfessor", exercise)
   
   def compile(self, exercise, challenge):
-    sources = [x[1] for x in exercise.templates if x[1].endswith(".cs")]
-    sources += [x[1] for x in exercise.assets if x[1].endswith(".cs")]
-    cmd = "mcs " + "".join(sources) + " -out:" + exercise.mainfile
+    sources = [challenge.rootpath + x.env_filepath for x in exercise.templates if x.env_filepath.endswith(".cs")]
+    sources += [challenge.rootpath + x.env_filepath for x in exercise.assets if x.env_filepath.endswith(".cs")]
+
+    output_filepath = challenge.rootpath + exercise.mainfile
+    output_folderpath = os.path.dirname(output_filepath)
+
+    self.create_folder(output_folderpath)
+    
+    cmd = "mcs " + "".join(sources) + " -out:" + output_filepath
     
     comp = Compilation()
     comp.returncode, comp.stdout, comp.stderr = self.execute(cmd)
@@ -20,13 +27,5 @@ class CSharpProfessor(BaseProfessor):
 
     challenge.compilation = comp
 
-  def add_challenge(self, ch):
-
-    # Copy and render the template files into the container, compile if necessary
-    self.deploy(ch)
-
-    # Execute the exercise with current execution parameters
-    ch.returncode, ch.stdout, ch.stderr = self.execute("mono " + self.exercise.mainfile + " " + ch.input_params)
-
-    # Add respose to summary
-    self.add_challenge_result(ch)
+  def run(self, ex, ch):
+    ch.returncode, ch.stdout, ch.stderr = self.execute("mono " + ch.rootpath + ex.mainfile + " " + ch.input_params)

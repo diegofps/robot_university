@@ -24,7 +24,14 @@ class Exercise:
 
         print(prefix + "image_name: " + self.image_name)
         print(prefix + "mainfile: " + self.mainfile)
-        print(prefix + "templates: " + str(self.templates))
-        print(prefix + "stud_params: " + str(self.stud_params))
+
+        print(prefix + "templates:")
+        for template in self.templates:
+            print(prefix + "  " + str(template))
+
+        print(prefix + "stud_params:")
+        for key, value in self.stud_params.items():
+            print(prefix + "  " + key + "='" + value + "'")
+
         print(prefix + "assets: " + str(self.assets))
         print()

@@ -1,5 +1,6 @@
 from .baseprofessor import BaseProfessor
 from .compilation import Compilation
+import os
 
 class CProfessor(BaseProfessor):
 
@@ -10,10 +11,15 @@ class CProfessor(BaseProfessor):
     super().__init__("CProfessor", exercise)
   
   def compile(self, exercise, challenge):
-    sources = [x[1] for x in exercise.templates if x[1].endswith(".c")]
-    sources += [x[1] for x in exercise.assets if x[1].endswith(".c")]
+    sources = [challenge.rootpath + x.env_filepath for x in exercise.templates if x.env_filepath.endswith(".c")]
+    sources += [challenge.rootpath + x.env_filepath for x in exercise.assets if x.env_filepath.endswith(".c")]
+    
+    output_filepath = challenge.rootpath + exercise.mainfile
+    output_folderpath = os.path.dirname(output_filepath)
 
-    cmd = "clang " + "".join(sources) + " -o " + challenge.rootpath + exercise.mainfile
+    self.create_folder(output_folderpath)
+
+    cmd = "clang " + " ".join(sources) + " -o " + output_filepath
     
     comp = Compilation()
     comp.returncode, comp.stdout, comp.stderr = self.execute(cmd)

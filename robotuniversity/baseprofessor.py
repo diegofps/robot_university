@@ -44,7 +44,7 @@ class BaseProfessor(DockerEnv):
         self.never_compiled = False
 
     def compile(self, exercise, challenge):
-        # Overwrite this in case this source needs custom compiling (like c,cpp, java, csharp, ...)
+        # Overwrite this in case this source needs custom compiling (like c, cpp, java, csharp, ...)
         challenge.compilation = Compilation()
 
     def check_challenge_response(self, ch):

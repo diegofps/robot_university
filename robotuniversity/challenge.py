@@ -26,24 +26,28 @@ class Challenge:
 
         print()
         print(prefix + "Challenge %d:" % self.idd)
-        print(prefix + "  rootpath: " + str(self.rootpath))
-        print(prefix + "  expected_returncode: " + str(self.expected_returncode))
-        print(prefix + "  expected_stdout: " + self.expected_stdout)
-        print(prefix + "  expected_stderr: " + self.expected_stderr)
-
+        print(prefix + "  env_rootpath: " + str(self.rootpath))
         print(prefix + "  input_params: " + self.input_params)
         print(prefix + "  prof_params: " + str(self.prof_params))
 
-        print(prefix + "  returncode: " + str(self.returncode))
-        print(prefix + "  stdout: " + self.stdout)
-        print(prefix + "  stderr: " + self.stderr)
+        if include_program:
+            print(prefix + "  prof_program: " + self.prof_program)
+        
+        print()
+        print(prefix + "  Expected: ")
+        print(prefix + "    returncode: " + str(self.expected_returncode))
+        print(prefix + "    stdout: " + self.expected_stdout)
+        print(prefix + "    stderr: " + self.expected_stderr)
 
-        print(prefix + "  issues_explanation: " + str(self.issues_explanation))
-        print(prefix + "  correctness: " + str(self.correctness))
+        print()
+        print(prefix + "  Obtained: ")
+        print(prefix + "    returncode: " + str(self.returncode))
+        print(prefix + "    stdout: " + self.stdout)
+        print(prefix + "    stderr: " + self.stderr)
+
+        print(prefix + "    issues_explanation: " + str(self.issues_explanation))
+        print(prefix + "    correctness: " + str(self.correctness))
 
         if self.compilation:
             self.compilation.show(indentation + 2, include_program)
-
-        if include_program:
-            print(prefix + "  prof_program: " + self.prof_program)
         

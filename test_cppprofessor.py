@@ -5,7 +5,7 @@ from robotuniversity.challenge import Challenge
 from robotuniversity.exercise import Exercise
 
 exercise = Exercise()
-exercise.add_template(local_filepath="./classes/cpp/exercise1/main.template.cpp", env_filepath="main.cpp")
+exercise.add_template(local_filepath="./classes/cpp/exercise1/main.template.cpp", env_filepath="/app/main.cpp")
 exercise.mainfile = "/app/main"
 exercise.stud_params = {
     "STUD.IMPORTS": "",

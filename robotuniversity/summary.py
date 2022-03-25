@@ -9,6 +9,7 @@ class Summary(dict):
         self.challenges = []
 
     def show(self, include_programs=False):
+        
         print("--- SUMMARY ---" )
         print("  professor_name:", self.professor_name)
         print("  num_challenges:", self.num_challenges)
