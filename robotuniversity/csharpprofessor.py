@@ -19,7 +19,7 @@ class CSharpProfessor(BaseProfessor):
 
     self.create_folder(output_folderpath)
     
-    cmd = "mcs " + "".join(sources) + " -out:" + output_filepath
+    cmd = "mcs " + " ".join(sources) + " -out:" + output_filepath
     
     comp = Compilation()
     comp.returncode, comp.stdout, comp.stderr = self.execute(cmd)

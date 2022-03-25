@@ -9,19 +9,21 @@ class Summary(dict):
         self.challenges = []
 
     def show(self, include_programs=False):
+        # import pdb; pdb.set_trace()
         
-        print("--- SUMMARY ---" )
-        print("  professor_name:", self.professor_name)
-        print("  num_challenges:", self.num_challenges)
-        print("  num_correct_challenges:", self.num_correct_challenges)
-        print()
-
         print("--- EXERCISE ---")
         if self.exercise:
             self.exercise.show(2, include_programs)
         print()
 
         print("--- CHALLENGES ---")
-        for ex in self.challenges:
-            ex.show(2, include_programs)
+        for ch in self.challenges:
+            ch.show(2, include_programs)
         print()
+
+        print("--- SUMMARY ---" )
+        print("  professor_name:", self.professor_name)
+        print("  num_challenges:", self.num_challenges)
+        print("  num_correct_challenges:", self.num_correct_challenges)
+        print()
+

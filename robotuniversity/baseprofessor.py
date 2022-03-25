@@ -40,6 +40,14 @@ class BaseProfessor(DockerEnv):
             
             self.create_file(env_filepath, program)
         
+        for asset in self.exercise.assets:
+            env_filepath = ch.rootpath + asset.env_filepath
+
+            if asset.content is None:
+                self.send_file(asset.local_filepath, env_filepath)
+            else:
+                self.create_file(env_filepath, asset.content)
+        
         self.compile(self.exercise, ch)
         self.never_compiled = False
 
